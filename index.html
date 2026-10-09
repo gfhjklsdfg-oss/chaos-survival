@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#101327">
+<title>카오스 생존 4인전</title>
+<style>
+:root{--bg:#101327;--panel:#191d38;--line:#343b67;--text:#f4f6ff;--muted:#aab2d7;--cyan:#62f4e5;--pink:#ff5b9b;--yellow:#ffd166}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#22264b,#101327 65%);color:var(--text);font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif;min-height:100vh}button,input{font:inherit}button{border:0;border-radius:13px;padding:12px 15px;font-weight:800;color:#11152b;background:var(--cyan);cursor:pointer;touch-action:manipulation}button:disabled{opacity:.45;cursor:not-allowed}.secondary{background:#2b3158;color:#f4f6ff;border:1px solid #444b78}.danger{background:var(--pink)}.wrap{max-width:1050px;margin:auto;padding:16px}.hero{text-align:center;padding:18px 0 12px}.eyebrow{color:var(--cyan);letter-spacing:3px;font-size:12px;font-weight:900}.hero h1{font-size:clamp(30px,7vw,54px);line-height:1.05;margin:9px 0;background:linear-gradient(90deg,#fff,#62f4e5,#ff78b2);background-clip:text;color:transparent}.hero p{color:var(--muted);margin:8px auto;max-width:620px}.panel{background:#191d38eF;border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:0 15px 40px #0003}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{width:100%;padding:12px;border-radius:12px;background:#0f1329;border:1px solid #42496e;color:white;margin:7px 0 12px;outline:none}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.roomcode{font-size:25px;font-weight:1000;letter-spacing:5px;color:var(--yellow)}.muted{color:var(--muted);font-size:13px}.status{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:99px;padding:7px 10px;font-size:12px;color:var(--muted)}.dot{width:8px;height:8px;border-radius:50%;background:#777}.dot.ok{background:#65f5a3;box-shadow:0 0 12px #65f5a3}.hidden{display:none!important}.playerlist{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:12px 0}.playerchip{border:1px solid var(--line);border-radius:12px;padding:9px;background:#11162d;min-width:0}.playerchip b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.playerchip small{color:var(--muted)}#gamePanel{padding:10px}#gameCanvas{display:block;width:100%;height:min(58vh,520px);min-height:300px;border-radius:15px;background:#151b35;touch-action:none}.gamehud{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:9px 4px;flex-wrap:wrap}.bigstat{font-weight:900}.eventbanner{text-align:center;background:#2a2148;border:1px solid #594d91;color:#fff0a8;padding:10px;border-radius:12px;margin:4px 0 10px;font-weight:900;min-height:42px}.controls{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:10px 3px}.joystick{width:132px;height:132px;border-radius:50%;border:2px solid #66709b;background:#ffffff10;position:relative;touch-action:none;flex-shrink:0}.stick{position:absolute;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),#7da9ff);left:38px;top:38px;box-shadow:0 5px 18px #0006;pointer-events:none}.actionstack{display:flex;flex-direction:column;gap:8px;align-items:stretch;min-width:125px}.actionstack button{min-height:52px}.tip{font-size:12px;color:var(--muted);line-height:1.5}.log{max-height:120px;overflow:auto;font-size:12px;color:#c8cdef;padding:7px}.footer{text-align:center;color:#7f88b5;font-size:11px;padding:16px}.result{text-align:center;padding:24px}.result h2{font-size:34px;color:var(--yellow)}@media(max-width:620px){.wrap{padding:10px}.grid{grid-template-columns:1fr}.playerlist{grid-template-columns:repeat(2,1fr)}.panel{padding:13px}#gameCanvas{height:48vh;min-height:270px}.hero{padding-top:12px}.controls{align-items:center}.joystick{width:116px;height:116px}.stick{left:31px;top:31px}.actionstack{min-width:112px}.actionstack button{padding:10px 8px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">4 PLAYERS · ONLINE PARTY SURVIVAL</div>
+    <h1>카오스 생존 4인전</h1>
+    <p>운석을 피하고, 코인을 줍고, 랜덤 재난에서 살아남아라.<br>마지막까지 살아남은 사람이 승리!</p>
+    <div class="row" style="justify-content:center;margin-top:12px"><span class="status"><span id="netDot" class="dot"></span><span id="netText">온라인 연결 준비 중</span></span><span class="status">📱 모바일 조작 지원</span><span class="status">👥 최대 4명</span></div>
+  </header>
+
+  <section id="lobby" class="panel">
+    <div class="grid">
+      <div>
+        <h3>🎮 플레이어 설정</h3>
+        <label class="muted" for="nameInput">닉네임</label>
+        <input id="nameInput" class="field" maxlength="12" placeholder="예: 감자왕" value="">
+        <p class="muted">각자 휴대폰에서 같은 방 코드로 접속해!</p>
+      </div>
+      <div>
+        <h3>🌐 온라인 방</h3>
+        <button id="createBtn" style="width:100%">새 방 만들기 (방장)</button>
+        <div style="height:8px"></div>
+        <label class="muted" for="codeInput">친구 방 코드</label>
+        <div class="row"><input id="codeInput" class="field" style="margin:5px 0;flex:1;text-transform:uppercase;letter-spacing:3px" maxlength="5" placeholder="ABCDE"><button id="joinBtn" class="secondary">참가</button></div>
+      </div>
+    </div>
+    <div id="roomArea" class="hidden" style="margin-top:12px;border-top:1px solid var(--line);padding-top:14px">
+      <div class="row" style="justify-content:space-between"><div><div class="muted">현재 방 코드 · 친구에게 알려줘</div><div id="roomCode" class="roomcode">-----</div></div><button id="copyBtn" class="secondary">코드 복사</button></div>
+      <div id="playerList" class="playerlist"></div>
+      <p id="lobbyHint" class="muted">방장이 게임을 시작할 수 있어요. 2~4명이 모이면 시작!</p>
+      <div class="row"><button id="startBtn" disabled>⚡ 생존 시작</button><button id="leaveBtn" class="secondary">방 나가기</button></div>
+      <div id="connectionHelp" class="tip" style="margin-top:10px">친구도 이 페이지를 열고 방 코드로 참가하세요. 연결에는 인터넷이 필요합니다.</div>
+    </div>
+    <div id="errorBox" class="muted" role="status" style="margin-top:12px"></div>
+  </section>
+
+  <section id="gamePanel" class="panel hidden" style="margin-top:12px">
+    <div class="gamehud"><div><span class="muted">생존 시간</span> <span id="timer" class="bigstat">0초</span></div><div><span class="muted">내 코인</span> <span id="coins" class="bigstat">0</span> 🪙</div><div><span class="muted">생존자</span> <span id="aliveCount" class="bigstat">0/4</span></div></div>
+    <div id="eventBanner" class="eventbanner">재난을 준비하는 중...</div>
+    <canvas id="gameCanvas" width="900" height="600" aria-label="생존 경기장"></canvas>
+    <div class="controls">
+      <div><div id="joystick" class="joystick"><div id="stick" class="stick"></div></div><div class="tip" style="text-align:center;margin-top:5px">여기를 움직여 이동</div></div>
+      <div class="actionstack"><button id="dashBtn">💨 대시</button><button id="emoteBtn" class="secondary">😈 도발!</button><div class="tip">컴퓨터: WASD / 방향키<br>대시: 버튼 또는 Space</div></div>
+    </div>
+    <div id="gameLog" class="log"></div>
+    <div id="resultPanel" class="result hidden"><h2 id="resultTitle">🏆 승리!</h2><p id="resultText"></p><button id="againBtn">로비로 돌아가기</button></div>
+  </section>
+  <div class="footer">카오스 생존 4인전 · 친구들과 즐기는 파티 게임</div>
+</div>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script>
+(()=> {
+const $=id=>document.getElementById(id);
+const COLORS=['#62f4e5','#ff5b9b','#ffd166','#9c8cff'];
+let peer=null, hostConn=null, conns=new Map(), isHost=false, room='', myId='', myName='', players=[], game=null, lastTick=0, raf=0, joy={x:0,y:0}, keys={}, dashUntil=0, lastDash=0, lastEmote=0, peerReady=false, started=false;
+const W=900,H=600;
+function setNet(s,ok=false){$('netText').textContent=s;$('netDot').className='dot'+(ok?' ok':'')}
+function error(s){$('errorBox').textContent=s}
+function safeName(){return ($('nameInput').value.trim()||('플레이어'+Math.floor(Math.random()*90+10))).slice(0,12)}
+function codeGen(){return Math.random().toString(36).slice(2,7).toUpperCase()}
+function getMe(){return players.find(p=>p.id===myId)}
+function initPeer(id){return new Promise((resolve,reject)=>{if(!window.Peer){reject(new Error('온라인 연결 라이브러리를 불러오지 못했어요. 인터넷 연결을 확인해 주세요.'));return}peer=new Peer(id,{debug:0});peer.on('open',()=>{peerReady=true;resolve()});peer.on('error',e=>{setNet('연결 오류');error(e.type==='unavailable-id'?'이 방 코드가 이미 사용 중이에요. 방을 다시 만들어 주세요.':('연결 오류: '+e.type+' — 인터넷 연결을 확인해 주세요.'));if(!peerReady)reject(e)});peer.on('disconnected',()=>setNet('서버 연결 끊김'));peer.on('close',()=>{peerReady=false});peer.on('connection',c=>{if(!isHost){c.close();return}wireHost(c)})})}
+function wireHost(c){c.on('open',()=>{if(players.length>=4){c.send({type:'full'});c.close();return}c.on('data',d=>handleHostMsg(c,d));c.on('close',()=>{conns.delete(c.peer);removePlayer(c.peer);broadcastState()});c.on('error',()=>{});conns.set(c.peer,c);c.send({type:'welcome',id:c.peer,room,players,game:game?serializeGame():null});});}
+function handleHostMsg(c,d){if(!d||typeof d!=='object')return;if(d.type==='hello'){if(players.length>=4){c.send({type:'full'});return}let p=players.find(x=>x.id===c.peer);if(!p){players.push({id:c.peer,name:String(d.name||'친구').slice(0,12),color:COLORS[players.length%4],x:W/2,y:H/2,hp:100,coins:0,alive:true,score:0});log('👋 '+players[players.length-1].name+' 참가!');broadcastState()}return}if(d.type==='input'&&game){let p=players.find(x=>x.id===c.peer);if(p&&p.alive){p.dx=Math.max(-1,Math.min(1,Number(d.x)||0));p.dy=Math.max(-1,Math.min(1,Number(d.y)||0));if(d.dash)doDash(p)}}if(d.type==='emote')log('😈 '+(players.find(x=>x.id===c.peer)?.name||'친구')+'의 도발!')}
+function sendHost(d){if(hostConn&&hostConn.open)hostConn.send(d)}
+function sendAll(d){for(const c of conns.values())if(c.open)c.send(d)}
+function broadcastState(){renderPlayers();if(isHost)sendAll({type:'state',players,game:game?serializeGame():null,room})}
+function renderPlayers(){const list=$('playerList');list.innerHTML='';players.forEach((p,i)=>{const el=document.createElement('div');el.className='playerchip';el.innerHTML='<b></b><small></small>';el.querySelector('b').textContent=(p.id===myId?'⭐ ':'')+p.name;el.querySelector('small').textContent=(p.alive===false?'탈락':(started?'생존 중':'참가 완료'));el.style.borderColor=p.color;list.appendChild(el)});for(let i=players.length;i<4;i++){const el=document.createElement('div');el.className='playerchip';el.innerHTML='<b>빈 자리</b><small>친구를 기다리는 중</small>';list.appendChild(el)}$('startBtn').disabled=!isHost||players.length<2||started;$('lobbyHint').textContent=isHost?'2~4명이 모이면 시작 버튼을 눌러!':'방장이 게임을 시작할 때까지 기다려줘.'}
+function showRoom(){ $('roomArea').classList.remove('hidden');$('roomCode').textContent=room; $('lobby').classList.remove('hidden');$('gamePanel').classList.add('hidden');renderPlayers()}
+function cleanRoom(){if(raf)cancelAnimationFrame(raf);if(peer){try{peer.destroy()}catch(e){}}peer=null;hostConn=null;conns.clear();peerReady=false;isHost=false;room='';myId='';players=[];game=null;started=false;joy={x:0,y:0};$('roomArea').classList.add('hidden');$('lobby').classList.remove('hidden');$('gamePanel').classList.add('hidden');$('resultPanel').classList.add('hidden');error('');setNet('온라인 연결 준비 중');}
+$('createBtn').onclick=async()=>{cleanRoom();myName=safeName();room=codeGen();myId='host-'+room.toLowerCase();isHost=true;setNet('방 만드는 중...');$('createBtn').disabled=true;try{await initPeer(myId);players=[{id:myId,name:myName,color:COLORS[0],x:W/2,y:H/2,hp:100,coins:0,alive:true,score:0,dx:0,dy:0}];setNet('방 생성 완료',true);showRoom();error('');}catch(e){isHost=false;room='';myId='';setNet('연결 실패');}finally{$('createBtn').disabled=false}};
+$('joinBtn').onclick=async()=>{cleanRoom();myName=safeName();room=$('codeInput').value.trim().toUpperCase();if(!/^[A-Z0-9]{5}$/.test(room)){error('방 코드는 영문/숫자 5자리로 입력해 주세요.');return}myId='p-'+Math.random().toString(36).slice(2,10);setNet('방에 연결 중...');$('joinBtn').disabled=true;try{await initPeer(myId);hostConn=peer.connect('host-'+room.toLowerCase(),{reliable:true});hostConn.on('open',()=>{hostConn.send({type:'hello',name:myName});setNet('방에 연결됨',true)});hostConn.on('data',d=>{if(d.type==='welcome'){if(d.room!==room)return;players=d.players||[];if(!players.some(p=>p.id===myId))players.push({id:myId,name:myName,color:COLORS[players.length%4],x:W/2,y:H/2,hp:100,coins:0,alive:true});showRoom();hostConn.send({type:'hello',name:myName})}else if(d.type==='state'){players=d.players||players;if(d.game){game=d.game;started=true;showGame()}else if(started){started=false;showLobbyAfterGame()}renderPlayers();if(game)draw()}else if(d.type==='start'){game=d.game;started=true;showGame()}else if(d.type==='full'){error('이 방은 이미 4명으로 가득 찼어요.');cleanRoom()}else if(d.type==='end'){game=d.game;showGame();finishGame(d.winner)}});hostConn.on('error',()=>error('방에 연결할 수 없어요. 방 코드와 인터넷을 확인해 주세요.'));hostConn.on('close',()=>{setNet('방 연결 끊김');error('방장과 연결이 끊겼어요.')});setTimeout(()=>{if(!players.length&&!started&&hostConn&&!hostConn.open)error('연결이 오래 걸려요. 방 코드가 맞는지 확인해 주세요.')},9000)}catch(e){error('온라인 연결에 실패했어요. 인터넷 연결을 확인해 주세요.')}finally{$('joinBtn').disabled=false}};
+$('copyBtn').onclick=async()=>{try{await navigator.clipboard.writeText(room);$('copyBtn').textContent='복사 완료!';setTimeout(()=>$('copyBtn').textContent='코드 복사',1200)}catch(e){error('방 코드: '+room+' (길게 눌러 복사해 주세요)')}};
+$('leaveBtn').onclick=()=>{cleanRoom()};
+function showGame(){ $('lobby').classList.add('hidden');$('gamePanel').classList.remove('hidden');$('resultPanel').classList.add('hidden');if(!raf)raf=requestAnimationFrame(loop);draw()}
+function showLobbyAfterGame(){ $('gamePanel').classList.add('hidden');$('lobby').classList.remove('hidden');started=false;renderPlayers()}
+$('startBtn').onclick=()=>{if(!isHost||players.length<2)return;started=true;game={time:0,phase:'playing',event:'곧 랜덤 재난이 시작됩니다!',eventUntil:5,zone:{x:W/2,y:H/2,r:290},hazards:[],items:[],nextEvent:5,seed:Math.random()};players.forEach((p,i)=>{p.x=W/2+Math.cos(i*Math.PI/2)*125;p.y=H/2+Math.sin(i*Math.PI/2)*100;p.hp=100;p.coins=0;p.alive=true;p.dx=0;p.dy=0});$('eventBanner').textContent=game.event;sendAll({type:'start',game:serializeGame()});showGame();broadcastState();log('⚡ 게임 시작! 재난을 피하고 코인을 모아!')};
+function serializeGame(){return game?JSON.parse(JSON.stringify(game)):null}
+function log(s){const el=$('gameLog');el.innerHTML='<div>'+escapeHtml(s)+'</div>'+el.innerHTML;while(el.children.length>12)el.lastChild.remove()}
+function escapeHtml(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function rand(a,b){return a+Math.random()*(b-a)}
+function dist(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
+function doDash(p){const now=Date.now();if(now-lastDash<1800)return;lastDash=now;p.dash=Date.now()+280;p.x+=((p.dx||0)*80);p.y+=((p.dy||0)*80);p.x=Math.max(25,Math.min(W-25,p.x));p.y=Math.max(25,Math.min(H-25,p.y))}
+function randomEvent(){const types=['☄️ 운석 폭격! 빨간 원에서 벗어나!','🧊 빙판 지대! 움직임이 미끄러워져!','🌪️ 회오리 바람! 모두 중앙으로 끌려가!','🪙 코인 폭풍! 코인이 쏟아진다!','🌑 안전 구역 축소! 바깥에 있으면 피해!','💚 회복의 비! 살아남은 모두 체력 회복!'];const n=Math.floor(Math.random()*types.length);game.event=types[n];game.eventUntil=game.time+4; if(n===0){for(let i=0;i<4;i++)game.hazards.push({x:rand(70,W-70),y:rand(70,H-70),r:52,life:2.4,kind:'meteor'})}if(n===3){for(let i=0;i<14;i++)game.items.push({x:rand(35,W-35),y:rand(35,H-35),life:8})}if(n===4)game.zone.r=Math.max(90,game.zone.r-28);if(n===5)players.filter(p=>p.alive).forEach(p=>p.hp=Math.min(100,p.hp+22));if(n===2)players.filter(p=>p.alive).forEach(p=>{p.x+=(W/2-p.x)*.18;p.y+=(H/2-p.y)*.18});log(game.event);$('eventBanner').textContent=game.event}
+function hostStep(dt){if(!game||game.phase!=='playing')return;game.time+=dt;if(game.time>=game.nextEvent){randomEvent();game.nextEvent=game.time+rand(5,8)}game.hazards.forEach(h=>h.life-=dt);game.hazards=game.hazards.filter(h=>h.life>0);game.items.forEach(it=>it.life-=dt);game.items=game.items.filter(it=>it.life>0);
+players.filter(p=>p.alive).forEach(p=>{const speed=190*(game.event.includes('빙판')?1.35:1);p.x+=((p.dx||0)*speed*dt);p.y+=((p.dy||0)*speed*dt);p.x=Math.max(18,Math.min(W-18,p.x));p.y=Math.max(18,Math.min(H-18,p.y));if(dist(p,game.zone)>game.zone.r){p.hp-=17*dt}game.hazards.forEach(h=>{if(dist(p,h)<h.r){p.hp-=35*dt}});game.items=game.items.filter(it=>{if(dist(p,it)<27){p.coins+=1;return false}return true});if(p.hp<=0){p.hp=0;p.alive=false;log('💥 '+p.name+' 탈락!')}});const alive=players.filter(p=>p.alive);if(alive.length<=1){game.phase='ended';game.winner=alive[0]?.id||null;sendAll({type:'end',game:serializeGame(),winner:game.winner});finishGame(game.winner)}if(Math.floor(game.time)!==Math.floor(game.time-dt)){broadcastState()}}
+function finishGame(winnerId){if(!game)return;game.phase='ended';$('resultPanel').classList.remove('hidden');const w=players.find(p=>p.id===winnerId);$('resultTitle').textContent=w?'🏆 '+w.name+' 우승!':'🤝 무승부!';$('resultText').textContent=w?'최종 생존자! 코인 '+w.coins+'개를 모았어요.':'모두 탈락했어! 다음 판에 복수하자.';$('eventBanner').textContent=w?('🏆 '+w.name+' 최종 우승!'):'모두 탈락!';draw();if(isHost)broadcastState()}
+$('againBtn').onclick=()=>{if(isHost){started=false;game=null;showLobbyAfterGame();broadcastState()}else{error('방장이 로비로 돌아가면 함께 돌아가요.')}};
+function draw(){const canvas=$('gameCanvas'),ctx=canvas.getContext('2d');const sx=canvas.width/W,sy=canvas.height/H;ctx.setTransform(sx,0,0,sy,0,0);ctx.clearRect(0,0,W,H);ctx.fillStyle='#141a33';ctx.fillRect(0,0,W,H);ctx.strokeStyle='#252d50';ctx.lineWidth=1;for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}if(game){ctx.save();ctx.beginPath();ctx.arc(game.zone.x,game.zone.y,game.zone.r,0,Math.PI*2);ctx.fillStyle='#62f4e510';ctx.fill();ctx.strokeStyle='#62f4e5';ctx.lineWidth=4;ctx.stroke();ctx.restore();game.items.forEach(it=>{ctx.fillStyle='#ffd166';ctx.beginPath();ctx.arc(it.x,it.y,9,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff1a8';ctx.beginPath();ctx.arc(it.x-2,it.y-2,3,0,Math.PI*2);ctx.fill()});game.hazards.forEach(h=>{ctx.fillStyle='#ff456b30';ctx.strokeStyle='#ff456b';ctx.lineWidth=3;ctx.beginPath();ctx.arc(h.x,h.y,h.r,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle='#ffb0c0';ctx.font='24px sans-serif';ctx.textAlign='center';ctx.fillText('☄',h.x,h.y+8)});players.forEach(p=>{ctx.globalAlpha=p.alive?1:.3;ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,17,0,Math.PI*2);ctx.fill();ctx.strokeStyle=p.id===myId?'#fff':'#101327';ctx.lineWidth=p.id===myId?4:2;ctx.stroke();ctx.fillStyle='#fff';ctx.font='bold 15px system-ui';ctx.textAlign='center';ctx.fillText(p.name.slice(0,8),p.x,p.y-25);ctx.fillStyle='#333';ctx.fillRect(p.x-20,p.y+23,40,5);ctx.fillStyle=p.hp>50?'#65f5a3':'#ff5b9b';ctx.fillRect(p.x-20,p.y+23,40*Math.max(0,p.hp/100),5);ctx.globalAlpha=1})}else{ctx.fillStyle='#9ca8d9';ctx.font='bold 25px system-ui';ctx.textAlign='center';ctx.fillText('방장이 게임을 시작하면 여기서 생존전이 시작돼!',W/2,H/2)}}
+function loop(ts){raf=requestAnimationFrame(loop);if(!started||!game){return}const dt=Math.min(.05,(ts-(lastTick||ts))/1000);lastTick=ts;if(isHost){const me=getMe();if(me){me.dx=joy.x+(keys.ArrowRight||keys.d?1:0)-(keys.ArrowLeft||keys.a?1:0);me.dy=joy.y+(keys.ArrowDown||keys.s?1:0)-(keys.ArrowUp||keys.w?1:0);const mag=Math.hypot(me.dx,me.dy);if(mag>1){me.dx/=mag;me.dy/=mag}}hostStep(dt)}else{sendHost({type:'input',x:joy.x+(keys.ArrowRight||keys.d?1:0)-(keys.ArrowLeft||keys.a?1:0),y:joy.y+(keys.ArrowDown||keys.s?1:0)-(keys.ArrowUp||keys.w?1:0)});}const me=getMe();$('timer').textContent=Math.floor(game.time||0)+'초';$('coins').textContent=me?me.coins:0;$('aliveCount').textContent=players.filter(p=>p.alive).length+'/4';$('eventBanner').textContent=game.event||'생존하라!';if(game.phase==='ended')$('resultPanel').classList.remove('hidden');if(Math.floor(ts/120)%2===0)draw()}
+function updateInput(){const x=joy.x+(keys.ArrowRight||keys.d?1:0)-(keys.ArrowLeft||keys.a?1:0),y=joy.y+(keys.ArrowDown||keys.s?1:0)-(keys.ArrowUp||keys.w?1:0);if(isHost){const p=getMe();if(p){p.dx=Math.max(-1,Math.min(1,x));p.dy=Math.max(-1,Math.min(1,y))}}else sendHost({type:'input',x,y})}
+const joyEl=$('joystick'),stick=$('stick');let pointer=null;
+function joyMove(e){const r=joyEl.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;let dx=(e.clientX-cx)/(r.width*.34),dy=(e.clientY-cy)/(r.height*.34),m=Math.hypot(dx,dy);if(m>1){dx/=m;dy/=m}joy.x=dx;joy.y=dy;stick.style.transform=`translate(${dx*30}px,${dy*30}px)`;updateInput()}
+joyEl.addEventListener('pointerdown',e=>{pointer=e.pointerId;joyEl.setPointerCapture(pointer);joyMove(e)});joyEl.addEventListener('pointermove',e=>{if(pointer===e.pointerId)joyMove(e)});function joyEnd(){pointer=null;joy={x:0,y:0};stick.style.transform='translate(0,0)';updateInput()}joyEl.addEventListener('pointerup',joyEnd);joyEl.addEventListener('pointercancel',joyEnd);
+window.addEventListener('keydown',e=>{keys[e.key]=true;if(e.code==='Space'){e.preventDefault();$('dashBtn').click()}updateInput()});window.addEventListener('keyup',e=>{keys[e.key]=false;updateInput()});
+$('dashBtn').onclick=()=>{const now=Date.now();if(now-lastDash<1800)return;lastDash=now;if(isHost){const p=getMe();if(p)doDash(p)}else sendHost({type:'input',x:joy.x,y:joy.y,dash:true});$('dashBtn').textContent='대시 충전 중';setTimeout(()=>$('dashBtn').textContent='💨 대시',1800)};
+$('emoteBtn').onclick=()=>{log('😈 도발 발동!');if(isHost)log(myName+'의 도발!');else sendHost({type:'emote'})};
+setNet('온라인 연결 준비 중');
+})();
+</script>
+</body>
+</html>
